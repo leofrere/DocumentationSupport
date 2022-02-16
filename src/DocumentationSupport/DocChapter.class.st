@@ -126,6 +126,28 @@ DocChapter >> delete [
 
 ]
 
+{ #category : #accessing }
+DocChapter >> exportJSON: aStream [
+	| endLine |
+	endLine := '",',String cr.
+	aStream nextPutAll: '{"title":"';
+		nextPutAll: title;
+		nextPutAll: endLine;
+		nextPutAll: ' "key":"';
+		nextPutAll: key;
+		nextPutAll: endLine;
+		nextPutAll: ' "parent":"';
+		nextPutAll: parent key;
+		nextPutAll: endLine;
+		nextPutAll: ' "source":';
+		nextPutAll: (STONJSON toString: source);
+		nextPutAll: endLine;
+		nextPutAll: ' "nextChapter":'.
+	self nextChapter
+		ifNil: [ aStream nextPutAll: 'null}',String cr ]
+		ifNotNil: [ aStream nextPutAll: '"',nextChapter key,'"}' ]
+]
+
 { #category : #'API - search' }
 DocChapter >> findNextString: aSearchPattern startingAt: currentSearchPosition [
 
