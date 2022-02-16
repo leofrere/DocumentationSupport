@@ -125,6 +125,27 @@ DocBook >> deleteChapter: aChapter [
 
 ]
 
+{ #category : #'as yet unclassified' }
+DocBook >> exportJSON: aStream [
+	| endLine |
+	endLine := '",',String cr.
+	aStream nextPutAll: '{"title":"';
+		nextPutAll: self title;
+		nextPutAll: endLine;
+		nextPutAll: ' "key":"';
+		nextPutAll: self key;
+		nextPutAll: endLine;
+		nextPutAll: ' "parent":'.
+	self parent
+		ifNil: [ aStream nextPutAll: 'null,',String cr ]
+		ifNotNil: [ aStream nextPutAll: '"',self parent key,'",',String cr ].
+	aStream nextPutAll: ' "chapters":['.
+	self chapters doWithIndex: [ :chapter :index |
+		 aStream nextPutAll: chapter exportJSON.
+		 index = chapters size ifFalse: [ aStream nextPutAll: ',',String cr ]].
+	aStream nextPutAll: ']}'
+]
+
 { #category : #'serialization support' }
 DocBook >> fixParentReferencesUsing: aDictionary [
 
