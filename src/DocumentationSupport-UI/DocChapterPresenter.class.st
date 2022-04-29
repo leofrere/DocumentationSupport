@@ -430,6 +430,12 @@ DocChapterPresenter >> text [
 	^ preview morph textArea text 
 ]
 
+{ #category : #accessing }
+DocChapterPresenter >> text: aText [
+
+	preview morph text: aText
+]
+
 { #category : #preview }
 DocChapterPresenter >> textFor: aSource [
 

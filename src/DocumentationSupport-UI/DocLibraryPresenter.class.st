@@ -31,7 +31,8 @@ Class {
 		'hasPrevChapterChange',
 		'editCheckBox',
 		'showCheckBox',
-		'showHeaderCheckBox'
+		'showHeaderCheckBox',
+		'zoomMacro'
 	],
 	#classInstVars : [
 		'searchInput'
@@ -59,6 +60,11 @@ DocLibraryPresenter class >> open: libraryName [
 	<script>
 	DocLibrary libraries ifEmpty: [ DocLibrary loadFromRepositories ].
 	^ (self on: (DocLibrary named: libraryName)) open
+]
+
+{ #category : #actions }
+DocLibraryPresenter >> TextFontClass [
+	^ TextFontReference
 ]
 
 { #category : #accessing }
@@ -98,6 +104,14 @@ DocLibraryPresenter >> addNewChapter [
 	tree selectItem: newChapter
 ]
 
+{ #category : #actions }
+DocLibraryPresenter >> array: anArray containsAtIndex: aBlock [
+	| index |
+	index := 0.
+	anArray doWithIndex: [:each :i | (aBlock value: each) ifTrue: [index := i]].
+	^ index
+]
+
 { #category : #events }
 DocLibraryPresenter >> aspect: anAspect changedFrom: anOrigin [
 
@@ -119,6 +133,21 @@ DocLibraryPresenter >> clickAt [
 { #category : #actions }
 DocLibraryPresenter >> clickAt: path [
 	tree clickAtPath: path
+]
+
+{ #category : #zoom }
+DocLibraryPresenter >> decZoom [
+	zoomMacro := -0.1
+	
+]
+
+{ #category : #zoom }
+DocLibraryPresenter >> decZoomChapterShortcut: aCategory [
+	aCategory
+			addKeymapEntry:
+				(KMKeymap named: #DecZoomShortcut shortcut: $- ctrl shift mac | $- ctrl shift win | $- ctrl shift unix  action: [ 
+					self decZoom;
+					zoom ])
 ]
 
 { #category : #actions }
@@ -162,7 +191,7 @@ DocLibraryPresenter >> editShortcut: aCategory [
 	aCategory
 			addKeymapEntry:
 				(KMKeymap named: #EditShortcut shortcut: $e ctrl shift mac | $e ctrl shift win | $e ctrl shift unix  action: [ 
-					editCheckBox state: editCheckBox state not ])
+					editCheckBox state: editCheckBox state not])
 ]
 
 { #category : #actions }
@@ -188,10 +217,26 @@ DocLibraryPresenter >> headerShortcut: aCategory [
 					showHeaderCheckBox state: showHeaderCheckBox state not ])
 ]
 
+{ #category : #zoom }
+DocLibraryPresenter >> incZoom [
+	zoomMacro := 0.1
+	
+]
+
+{ #category : #zoom }
+DocLibraryPresenter >> incZoomChapterShortcut: aCategory [
+	aCategory
+			addKeymapEntry:
+				(KMKeymap named: #IncZoomShortcut shortcut: $j ctrl shift mac | $j ctrl shift win | $j ctrl shift unix  action: [ 
+					self incZoom;
+					zoom ])
+]
+
 { #category : #initialization }
 DocLibraryPresenter >> initializePresenters [ 
 
 	super initializePresenters.
+	zoomMacro := 0.0 .
 	hasPrevChapterChange := false.
 	hasNextChapterChange := false.
 	docSearchObject := DocSearchEnvironment new.
@@ -610,7 +655,9 @@ DocLibraryPresenter >> setShortcuts [
 		self openChapterShortcut: category;
 		headerChapterShortcut: category;
 		editChapterShortcut: category;
-		showChapterShortcut: category.
+		showChapterShortcut: category;
+		incZoomChapterShortcut: category;
+		decZoomChapterShortcut: category.
 		
 		
 		"Set library shortcuts"
@@ -714,4 +761,32 @@ DocLibraryPresenter >> updateTree [
 	tree expandAll.
 	
 
+]
+
+{ #category : #zoom }
+DocLibraryPresenter >> zoom [
+	| text runs i font | 
+	actualChapterPresenter textFor: actualChapterPresenter chapter source.
+	text := actualChapterPresenter text.
+	runs := actualChapterPresenter text runs.
+	runs doWithIndex:  [ :run :index |
+		i := self array: run containsAtIndex: [ :elt | elt class = self TextFontClass ].
+		i = 0
+			ifFalse: [ 
+				font == (run at: i) font 
+					ifFalse: [ 
+						font := (run at: i) font.
+						run at: i put: (TextFontReference toFont: (LogicalFont familyName: 'Source Sans Pro'	pointSize: (font pointSize + zoomMacro))).
+						 ]
+				
+				] 
+			ifTrue: [ 
+				| col |
+				col := run asOrderedCollection.
+				col add: (TextFontReference toFont: (LogicalFont familyName: 'Source Sans Pro'	pointSize: (10 + zoomMacro))).
+				runs at: index put: col asArray 
+				]
+			].
+		
+	
 ]
