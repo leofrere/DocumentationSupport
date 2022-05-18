@@ -32,7 +32,8 @@ Class {
 		'editCheckBox',
 		'showCheckBox',
 		'showHeaderCheckBox',
-		'zoomMacro'
+		'zoomMacro',
+		'lastZoom'
 	],
 	#classInstVars : [
 		'searchInput'
@@ -137,7 +138,7 @@ DocLibraryPresenter >> clickAt: path [
 
 { #category : #zoom }
 DocLibraryPresenter >> decZoom [
-	zoomMacro := -0.1
+	zoomMacro := -10
 	
 ]
 
@@ -219,7 +220,7 @@ DocLibraryPresenter >> headerShortcut: aCategory [
 
 { #category : #zoom }
 DocLibraryPresenter >> incZoom [
-	zoomMacro := 0.1
+	zoomMacro := 10
 	
 ]
 
@@ -236,7 +237,8 @@ DocLibraryPresenter >> incZoomChapterShortcut: aCategory [
 DocLibraryPresenter >> initializePresenters [ 
 
 	super initializePresenters.
-	zoomMacro := 0.0 .
+	zoomMacro := 0.0.
+	lastZoom = 0.
 	hasPrevChapterChange := false.
 	hasNextChapterChange := false.
 	docSearchObject := DocSearchEnvironment new.
