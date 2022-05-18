@@ -148,7 +148,8 @@ DocLibraryPresenter >> decZoomChapterShortcut: aCategory [
 			addKeymapEntry:
 				(KMKeymap named: #DecZoomShortcut shortcut: $- ctrl shift mac | $- ctrl shift win | $- ctrl shift unix  action: [ 
 					self decZoom;
-					zoom ])
+					zoom.
+					lastZoom = -1 ])
 ]
 
 { #category : #actions }
@@ -230,7 +231,8 @@ DocLibraryPresenter >> incZoomChapterShortcut: aCategory [
 			addKeymapEntry:
 				(KMKeymap named: #IncZoomShortcut shortcut: $j ctrl shift mac | $j ctrl shift win | $j ctrl shift unix  action: [ 
 					self incZoom;
-					zoom ])
+					zoom.
+					lastZoom = 1 ])
 ]
 
 { #category : #initialization }
